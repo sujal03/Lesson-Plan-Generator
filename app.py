@@ -2,6 +2,7 @@ import streamlit as st
 import base64
 import json
 from functions import *
+from bson.objectid import ObjectId
 
 # Initialize session state variables
 if "generate_clicked" not in st.session_state:
@@ -37,7 +38,10 @@ def load_streamlit_page():
     st.set_page_config(page_title="LLM Tool", layout="wide")
 
     # Sidebar for Inputs
-    st.sidebar.markdown("<h2 style='color: #ffffff;'>📄 Curriculum PDF Analyzer</h2>", unsafe_allow_html=True)
+    st.sidebar.markdown(
+        "<h2 style='color: var(--text-color, #1E90FF);'>📄 Curriculum PDF Analyzer</h2>",
+        unsafe_allow_html=True
+    )
     st.sidebar.markdown(
         """
         🔹 **Instructions:**  
@@ -112,7 +116,7 @@ if generate_button:
             data["duration"] = f"{days} days"
             document_id = push_to_mongo(data)
             st.session_state.document_id = document_id
-            # st.success("✅ Extracted data stored in MongoDB with updated duration!", icon="✅")
+            st.success("✅ Extracted data stored in MongoDB with updated duration!", icon="✅")
 
             st.session_state.extracted_data = data
 
@@ -121,13 +125,16 @@ if generate_button:
             st.session_state.edited_lesson_plan = lesson_plan
 
             update_lesson_plan_in_mongo(document_id, lesson_plan)
-            # st.success("✅ Lesson plan saved to MongoDB!", icon="✅")
+            st.success("✅ Lesson plan saved to MongoDB!", icon="✅")
 
         except Exception as e:
             st.error(f"❌ Error processing PDF: {str(e)}", icon="❌")
 
 # Main Content Section
-st.markdown("<h1 style='text-align: center; color: #ffffff;'>📘 Open Pedagogy - AI Parsing</h1>", unsafe_allow_html=True)
+st.markdown(
+    "<h1 style='text-align: center; color: var(--text-color, #1E90FF);'>📘 Open Pedagogy - AI Parsing</h1>",
+    unsafe_allow_html=True
+)
 st.divider()
 
 if uploaded_file is not None and class_data and topic and days and st.session_state.generate_clicked:
@@ -135,25 +142,17 @@ if uploaded_file is not None and class_data and topic and days and st.session_st
     tab_plan, tab_info = st.tabs(["📚 Lesson Plan", "📊 Extracted Info"])
 
     with tab_plan:
-        st.markdown("<h3 style='color: #ffffff;'>📚 Lesson Plan</h3>", unsafe_allow_html=True)
+        st.markdown(
+            "<h3 style='color: var(--text-color, #4682B4);'>📚 Lesson Plan</h3>",
+            unsafe_allow_html=True
+        )
 
-        # Edit Mode Handling with color change
+        # Edit Mode Handling without custom theme
         if st.session_state.edit_mode:
-            # Inject CSS to change text color in edit mode
-            st.markdown(
-                """
-                <style>
-                .stTextArea textarea {
-                    color: white;  
-                }
-                </style>
-                """,
-                unsafe_allow_html=True
-            )
             edited_lesson_plan = st.text_area(
-                "Edit the lesson plan below:", 
-                value=st.session_state.edited_lesson_plan, 
-                height=400, 
+                "Edit the lesson plan below:",
+                value=st.session_state.edited_lesson_plan,
+                height=400,
                 help="Modify the lesson plan as needed."
             )
             if st.button("💾 Save Changes", key="save_changes", help="Save your edits to the lesson plan."):
@@ -168,7 +167,7 @@ if uploaded_file is not None and class_data and topic and days and st.session_st
                     st.error("❌ Document ID not found. Cannot save to MongoDB.", icon="❌")
                 st.rerun()
         else:
-            # Display in non-edit mode with dark text for visibility
+            # Display in non-edit mode with theme-aware styling
             st.markdown(
                 f"""
                 <div style='background-color: #F0F8FF; color: #333333; padding: 15px; border-radius: 10px;'>
@@ -182,8 +181,8 @@ if uploaded_file is not None and class_data and topic and days and st.session_st
         col1, col2 = st.columns(2)
         with col1:
             st.button(
-                "✏️ Toggle Edit Mode", 
-                key="toggle_edit", 
+                "✏️ Toggle Edit Mode",
+                key="toggle_edit",
                 on_click=lambda: st.session_state.__setitem__("edit_mode", not st.session_state.edit_mode),
                 help="Switch between viewing and editing the lesson plan."
             )
@@ -197,7 +196,10 @@ if uploaded_file is not None and class_data and topic and days and st.session_st
             )
 
     with tab_info:
-        st.markdown("<h3 style='color: #4682B4;'>📊 Extracted Information Summary</h3>", unsafe_allow_html=True)
+        st.markdown(
+            "<h3 style='color: var(--text-color, #4682B4);'>📊 Extracted Information Summary</h3>",
+            unsafe_allow_html=True
+        )
         with st.expander("View Extracted Data", expanded=True):
             st.json(st.session_state.extracted_data, expanded=False)
 else:
